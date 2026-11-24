@@ -72,7 +72,6 @@ button{font:inherit;cursor:pointer;border:0;border-radius:16px}
  <input class="fld" id="nama" placeholder="Nama lengkap" maxlength="50" autocomplete="off">
  <input class="fld" id="kelas" placeholder="Kelas (contoh: XI IPS 2)" maxlength="20" autocomplete="off">
  <div class="err" id="err"></div>
- <p style="font-size:13px;color:#9d4a78;margin:0">⚠️ Kuis hanya bisa diisi 1 kali.</p>
  <button class="btn" onclick="begin()">🚀 Mulai Kuis (10 Soal)</button></div>
  <div id="done" class="mat hide"></div>
 </div>
@@ -94,7 +93,7 @@ button{font:inherit;cursor:pointer;border:0;border-radius:16px}
   <p class="score" id="score"></p>
   <p class="msg" id="msg"></p>
   <p class="msg">✅ Benar: <b id="cb"></b> &nbsp; ❌ Salah: <b id="cs"></b></p>
-  <p class="msg" id="who"></p><p class="msg" id="sent"></p>
+  <p class="msg" id="who"></p><p class="msg" id="sent"></p><button class="btn" onclick="startQuiz()">🔄 Ulangi Kuis</button>
  </div>
  <div class="card"><h3>📝 Jawaban &amp; Pembahasan</h3><div id="review"></div></div>
  <div class="by" style="text-align:center">Dibuat oleh Najiha &middot; NIM 06031182429020</div>
@@ -122,19 +121,13 @@ function lock(v){$("form").classList.add("hide");$("done").classList.remove("hid
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 async function begin(){const n=$("nama").value.trim(),k=$("kelas").value.trim();
  if(!n||!k){$("err").textContent="Isi nama dan kelas dulu ya 🌸";return}
- const sv=saved();if(sv){lock(sv);return}
  me={n,k};
- if(SHEET_URL){$("err").textContent="Memeriksa data...";
-  try{const r=await fetch(SHEET_URL+"?action=check&nama="+encodeURIComponent(n)+"&kelas="+encodeURIComponent(k));
-   if((await r.text()).trim()==="ada"){$("err").textContent="Nama & kelas ini sudah mengisi kuis. Kuis hanya bisa diisi 1 kali.";return}}catch(e){}}
  $("err").textContent="";startQuiz()}
 function save(sc,c){const rec={n:me.n,k:me.k,skor:sc,benar:c};
- try{localStorage.setItem(KEY,JSON.stringify(rec))}catch(e){}
  $("who").textContent="👤 "+me.n+" — "+me.k;
  if(SHEET_URL){$("sent").textContent="⏳ Mengirim skor...";
   fetch(SHEET_URL+"?action=submit&nama="+encodeURIComponent(me.n)+"&kelas="+encodeURIComponent(me.k)+"&skor="+sc+"&benar="+c)
   .then(()=>$("sent").textContent="✅ Skor sudah tersimpan untuk guru").catch(()=>$("sent").textContent="⚠️ Skor gagal terkirim, cek internet")}}
-window.addEventListener("load",()=>{const v=saved();if(v)lock(v)});
 let i=0,ans=[],muted=false,ctx;
 const $=id=>document.getElementById(id);
 function getCtx(){ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==="suspended")ctx.resume();return ctx}
